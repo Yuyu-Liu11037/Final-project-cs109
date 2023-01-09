@@ -7,11 +7,9 @@ public class Main {
     public static void main(String[] args) {
         /* CurrentStage:
         * 0: choose management
-        *
         * 1: location management
         * 2: person management
         * 3: nucleic acid testing management
-        *
         * 4: add location
         * 5: search location
         * 6: remove location
@@ -20,7 +18,6 @@ public class Main {
         * 9: remove person
         * 10: add nucleic acid testing
         * 11: search nucleic acid testing
-        * 12: remove nucleic acid testing
         *
         * 13: retrieve all locations
         * 14: retrieve location by ID
@@ -62,7 +59,7 @@ public class Main {
                     }
                     break;
                 case 1:
-                    System.out.println("Please input an operation number for location [0-3]:");
+                    System.out.println("Please input an operation number[0-3]:");
                     System.out.println("1. Add location:");
                     System.out.println("2. Search location:");
                     System.out.println("3. Remove location:");
@@ -84,7 +81,7 @@ public class Main {
                     }
                     break;
                 case 2:
-                    System.out.println("Please input an operation number for location [0-3]:");
+                    System.out.println("Please input an operation number [0-3]:");
                     System.out.println("1. Add person:");
                     System.out.println("2. Search person:");
                     System.out.println("3. Remove person:");
@@ -106,10 +103,9 @@ public class Main {
                     }
                     break;
                 case 3:
-                    System.out.println("Please input an operation number for location [0-3]:");
+                    System.out.println("Please input an operation number [0-2]:");
                     System.out.println("1. Add nucleic acid testing:");
                     System.out.println("2. Search nucleic acid testing:");
-                    System.out.println("3. Remove nucleic acid testing:");
                     System.out.println("0. Back to the previous directory");
                     n = scanner.nextInt();
                     switch (n){
@@ -121,9 +117,6 @@ public class Main {
                             break;
                         case 2:
                             currentStage = 11;
-                            break;
-                        case 3:
-                            currentStage = 12;
                             break;
                     }
                     break;
@@ -261,14 +254,12 @@ public class Main {
                             resultManage.retrieveResultByResult(tr);
                             break;
                         case 6:
-                            System.out.println("Please input multiple properties (testSide,tester,testDate,test result (allow \"null\") separated by \",\"):");
+                            System.out.println("Please input multiple properties (testSide,tester,testDate,test result (type \"null\" where the attribute is not retrieved) separated by \",\"):");
                             scanner.nextLine();
                             tr = scanner.nextLine();
                             resultManage.retrieveResult(tr);
                             break;
                     }
-                    break;
-                case 12:
                     break;
                 case 13:
                     resultManage.siteManage.retrieveTestingSite();

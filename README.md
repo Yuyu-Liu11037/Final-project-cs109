@@ -53,9 +53,9 @@
 **NOTE!**  先输入核酸检测点和检测人之后才能输入对应的结果
 
 ### (二) 冲突管理
-1. 核心代码：分别在 *resultManage.java、testerManage.java 、testingSiteMange.java* 的如下注释之后
+1. 核心代码：分别在src/manage目录下 *resultManage.java、testerManage.java 、testingSiteMange.java* 的如下注释之后
 ```
-// conflict
+// conflict management
 ```
 
 2. 测试数据：*src/test/testData.txt*

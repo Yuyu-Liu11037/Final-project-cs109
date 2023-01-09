@@ -107,7 +107,7 @@ public class resultManage {
         }
     }
     public void retrieveResultByTSID(int testSiteID){
-        ArrayList<result> testResult = null;
+        ArrayList<result> testResult = new ArrayList<>();
         for (result r : results){
             if (r.getSite().getID() == testSiteID){
                 testResult.add(r);
@@ -123,7 +123,7 @@ public class resultManage {
         }
     }
     public void retrieveResultByTesterID(long testerID){
-        ArrayList<result> testResult = null;
+        ArrayList<result> testResult = new ArrayList<>();
         for (result r : results){
             if (r.getPerson().getID() == testerID){
                 testResult.add(r);
@@ -139,7 +139,7 @@ public class resultManage {
         }
     }
     public void retrieveResultByDate(String testDate){
-        ArrayList<result> testResult = null;
+        ArrayList<result> testResult = new ArrayList<>();
         for (result r : results){
             if (r.getSite().getOpeningDate().equals(testDate)){
                 testResult.add(r);
@@ -155,9 +155,9 @@ public class resultManage {
         }
     }
     public void retrieveResultByResult(String result){
-        ArrayList<result> testResult = null;
+        ArrayList<result> testResult = new ArrayList<>();
         for (result r : results){
-            if (r.getPerson().equals(result)){
+            if (r.getTestResult().equals(result)){
                 testResult.add(r);
             }
         }
@@ -174,28 +174,28 @@ public class resultManage {
     public void retrieveResult(String input){
         String[] inputString = input.split(",");
         ArrayList<result> testResult = results;
-        if (inputString[0] != null){
+        if (!inputString[0].equals("null")){
             for (result r : testResult){
                 if (r.getSite().getID() != Integer.parseInt(inputString[0])){
                     testResult.remove(r);
                 }
             }
         }
-        if (inputString[1] != null){
+        if (!inputString[1].equals("null")){
             for (result r : testResult){
                 if (r.getPerson().getID() != Long.parseLong(inputString[1])){
                     testResult.remove(r);
                 }
             }
         }
-        if (inputString[2] != null){
+        if (!inputString[2].equals("null")){
             for (result r : testResult){
                 if (!r.getSite().getOpeningDate().equals(inputString[2])){
                     testResult.remove(r);
                 }
             }
         }
-        if (inputString[3] != null){
+        if (!inputString[3].equals("null")){
             for (result r : testResult){
                 if (!r.getPerson().getStage().equals(inputString[3])){
                     testResult.remove(r);

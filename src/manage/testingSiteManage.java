@@ -16,14 +16,7 @@ public class testingSiteManage {
         ListIterator<testingSite> iterator = testingSites.listIterator();
         while (iterator.hasNext()) {
             testingSite t = iterator.next();
-            boolean b1 = t.getID() == ts.getID();
-            boolean b2 = t.getTestingSiteName().equals(ts.getTestingSiteName());
-            boolean b3 = t.getCity().equals(ts.getCity());
-            boolean b4 = t.getOpeningDate().equals(ts.getOpeningDate());
-            boolean b5 = t.getOpeningTime().equals(ts.getOpeningTime());
-            boolean b = b1 && b2 && b3 && b4 && b5;
-
-            if (b){
+            if (t.getID() == ts.getID() && t.getTestingSiteName().equals(ts.getTestingSiteName()) && t.getCity().equals(ts.getCity()) && t.getOpeningDate().equals(ts.getOpeningDate()) && t.getOpeningTime().equals(ts.getOpeningTime())){
                 System.out.println("Duplicate testing site!");
                 return;
             }
