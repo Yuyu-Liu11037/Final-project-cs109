@@ -1,0 +1,420 @@
+<!DOCTYPE html><html>
+
+<head>
+    <title>Login -  Central Authentication Service</title>
+    <meta charset="UTF-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge" /><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" /><link rel="stylesheet" type="text/css" href="/cas/webjars/normalize.css/8.0.1/normalize.css" /><link rel="stylesheet" type="text/css" href="/cas/webjars/bootstrap/4.5.0/css/bootstrap-grid.min.css" /><link rel="stylesheet" type="text/css" href="/cas/webjars/material-components-web/4.0.0/dist/material-components-web.css" /><link rel="stylesheet" type="text/css" href="/cas/webjars/mdi__font/5.0.45/css/materialdesignicons.css" /><link rel="stylesheet" type="text/css" href="/cas/css/cas.css?v=6.2"/><link rel="stylesheet" type="text/css" href="./captcha/css/captcha.min.css"/><link rel="icon" href="/cas/favicon.ico" type="image/x-icon"/><meta http-equiv="X-UA-Compatible" content="IE=edge" /><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" /></head>
+
+<body class="login mdc-typography">
+<script type="text/javascript" src="/cas/webjars/es5-shim/4.5.9/es5-shim.js"></script>
+<script type="text/javascript" src="/cas/webjars/css-vars-ponyfill/2.3.1/dist/css-vars-ponyfill.min.js"></script>
+
+<script type="text/javascript" src="/cas/webjars/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript" src="/cas/webjars/material-components-web/4.0.0/dist/material-components-web.js"></script>
+
+<script type="text/javascript" src="/cas/js/cas.js?v=6.2" ></script>
+<script type="text/javascript" src="/cas/captcha/js/crypto-js.min.js"></script>
+<script type="text/javascript" src="/cas/captcha/js/captcha.min.js"></script>
+
+<script>
+    resourceLoadedSuccessfully();
+    cssVars({});
+</script>
+
+<script>
+    /*<![CDATA[*/
+    var trackGeoLocation = false;
+    /*]]>*/
+</script>
+<div>
+    <header id="app-bar" class="mdc-top-app-bar mdc-top-app-bar--fixed mdc-elevation--z4">
+        <nav class="mdc-top-app-bar__row">
+            <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+                <button class="mdc-icon-button mdc-top-app-bar__navigation-icon">
+                    <span class="mdi mdi-menu"></span>
+                    <span class="sr-only">menu</span>
+                </button>
+                <div class="cas-brand " style="width: 200px; background:url('/cas/images/cas-logo.png'); background-repeat: no-repeat;background-size: contain;margin-left: 20px; "></div>
+            </section>
+            <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-center">
+<!--                <img class="cas-brand mx-auto" src="/cas/images/cas-logo.png"/>--></section>
+            <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" style="width: 160px;">
+<!--                <div style="float:right;color:white;">--><!--                    <form id="zh" style="display:inline;" method="post"><input type="hidden" name="locale" value="zh_CN"><button class="mdc-button mdc-button__label" style="min-width:6px;color:white;padding: 0;margin: 0;border: 0;" type="submit">中文</button></form>--><!--                    |--><!--                    <form id="en" style="display:inline;" method="post"><input type="hidden" name="locale" value="en"><button class="mdc-button mdc-button__label" style="min-width:6px;color:white;padding: 0;margin: 0;border: 0;" type="submit">En</button></form>--><!--                </div>--><button id="cas-notifications-menu"
+                        class="mdc-icon-button mdc-top-app-bar__action-item cas-notification-toggle"
+                        aria-label="Bookmark this page">
+                    <span class="mdi mdi-bell-alert"></span>
+                    <span class="sr-only">notifications</span>
+                    <i id="notifications-count" class="notifications-count count">0</i>
+                </button>
+            </section>
+        </nav>
+
+    </header>
+    <aside id="app-drawer" class="mdc-drawer mdc-drawer--dismissible mdc-drawer--modal">
+<!--        <div class="mdc-drawer__header">--><!--            <h3 class="mdc-drawer__title">CAS</h3>--><!--            <h6 class="mdc-drawer__subtitle">Central Authentication Service</h6>--><!--        </div>--><div class="mdc-drawer__content">
+            <nav class="mdc-list">
+                <a href="/cas/user/info" class="mdc-list-item banner-primary">
+                    <i class="mdi mdi-cog"></i>&nbsp;
+                    <span class="mdc-list-item__text">User Profile</span>
+                </a>
+                <!--                <a th:href="@{/actuator}" class="mdc-list-item">--><!--                    <i class="mdi mdi-cogs"></i>&nbsp;--><!--                    <span class="mdc-list-item__text">Actuator Endpoints</span>--><!--                </a>--><hr class="mdc-list-divider"/><div class="text-center">
+                <form id="zh" class="d-inline" method="post"><input type="hidden" name="locale" value="zh_CN"><button class="mdc-button mdc-button__label" type="submit">中文</button></form>
+                    <span>|</span>
+                <form id="en" class="d-inline" method="post"><input type="hidden" name="locale" value="en"><button class="mdc-button mdc-button__label" type="submit">En</button></form>
+                </div>
+            </nav>
+        </div>
+    </aside>
+
+    <script>var countMessages = 0;</script>
+    <div class="mdc-dialog cas-notification-dialog" id="cas-notification-dialog" role="alertdialog"
+         aria-modal="true" aria-labelledby="notif-dialog-title" aria-describedby="notif-dialog-content">
+        <div class="mdc-dialog__container">
+            <div class="mdc-dialog__surface">
+                <div class="mdc-dialog__content" id="notif-dialog-content" style="padding-bottom: 0;">
+                    <div class="cas-notification-message mdc-typography--body1">
+                        <h6 style="margin-bottom: 5px;" class="mdc-typography--headline6 mdi mdi-information-variant">Sakai</h6>
+                        <hr/><p>sakai.sustech.edu.cn</p>
+                        <p>
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        </p>
+                    </div>
+                </div>
+                <footer class="mdc-dialog__actions" style="background-color: #dddddd;">
+                    <button type="button" class="mdc-button mdc-dialog__button "  data-mdc-dialog-action="accept"
+                            data-mdc-dialog-button-default>
+                        <span class="mdc-button__label">Continue</span>
+                    </button>
+                </footer>
+            </div>
+            </div>
+        <div class="mdc-dialog__scrim"></div>
+    </div>
+    <script type="text/javascript">
+
+        (function (material) {
+            var header = {
+                init: function () {
+                    header.attachTopbar();
+                    material.autoInit();
+                },
+                attachDrawer: function () {
+                    var elm = document.getElementById('app-drawer');
+                    var drawer = material.drawer.MDCDrawer.attachTo(elm);
+                    var closeDrawer = function (evt) {
+                        drawer.open = false;
+                    };
+                    drawer.foundation_.handleScrimClick = closeDrawer;
+                    document.onkeydown = function (evt) {
+                        evt = evt || window.event;
+                        if (evt.keyCode == 27) {
+                            closeDrawer();
+                        }
+                    };
+
+                    header.drawer = drawer;
+
+                    return drawer;
+                },
+                attachTopbar: function (drawer) {
+                    var drawer = header.attachDrawer();
+                    var dialog = header.attachNotificationDialog();
+                    header.attachDrawerToggle(drawer);
+                    header.attachNotificationToggle(dialog);
+                },
+                checkCaps: function (ev) {
+                    var s = String.fromCharCode(ev.which);
+                    if (s.toUpperCase() === s && s.toLowerCase() !== s && !ev.shiftKey) {
+                        ev.target.parentElement.classList.add('caps-on');
+                    } else {
+                        ev.target.parentElement.classList.remove('caps-on');
+                    }
+                },
+                attachDrawerToggle: function (drawer) {
+                    var topAppBar = material.topAppBar.MDCTopAppBar.attachTo(document.getElementById('app-bar'));
+                    topAppBar.setScrollTarget(document.getElementById('main-content'));
+                    topAppBar.listen('MDCTopAppBar:nav', function () {
+                        drawer.open = !drawer.open;
+                    });
+                    return topAppBar;
+                },
+                attachNotificationDialog: function () {
+                    var element = document.getElementById('cas-notification-dialog');
+                    var dialog = material.dialog.MDCDialog.attachTo(element);
+                    return dialog;
+                },
+                attachNotificationToggle: function (dialog) {
+                    var btn = document.getElementById('cas-notifications-menu');
+                    btn.addEventListener('click', function () {
+                        if(countMessages>0){
+                            dialog.open();
+                        }
+
+                    });
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                header.init();
+
+                if (countMessages == 0) {
+                    window.jQuery('#notifications-count').remove();
+                } else {
+                    window.jQuery('#notifications-count').text("(" + countMessages + ")")
+                }
+            });
+        })(mdc);
+    </script>
+</div>
+
+<div class="mdc-drawer-scrim"></div>
+
+<div class="mdc-drawer-app-content mdc-top-app-bar--fixed-adjust d-flex justify-content-center">
+    <main role="main" id="main-content" class="container-lg py-4">
+        <div id="content" class="d-flex justify-content-center">
+
+        <div  style="background-color: rgba(255,255,255,0.9);width:100%;"  class="d-flex justify-content-center flex-md-row flex-column mdc-card mdc-card-content w-lg-30">
+            <section id="loginForm"
+                class="login-section login-form">
+                <div class="d-flex flex-column justify-content-between m-auto">
+            <div>
+                <div id="serviceui" class="mb-4">
+        <div class="d-flex align-items-center p-2">
+            <img src="images/sustech.png" height="64" /><div id="servicedesc" class="ml-3">
+                <h2 style="margin-bottom: 3px;">
+                    <p style="margin-top: 0px;margin-bottom: 0px;">
+                        <span>
+                            <span>Sakai</span>
+                        </span>
+                    </p>
+                </h2>
+                </div>
+        </div>
+    </div>
+            </div>
+            <div class="form-wrapper">
+                <form method="post" id="fm1" action="login">
+
+                    <section class="cas-field my-2=3">
+                        </section>
+
+                    <section class="cas-field my-3">
+                        <div class="mdc-text-field  d-flex">
+                            <input class="mdc-text-field__input"
+                                id="username"
+                                size="25"
+                                type="text"
+                                accesskey="u"
+                                value=""
+                                autocomplete="off" name="username" /><label for="username" class="mdc-floating-label"><span class="accesskey">U</span>sername:</label>
+                        </div>
+                    </section>
+
+                    <section class="cas-field my-3 mdc-input-group">
+                        <div class="mdc-input-group-field mdc-input-group-field-append">
+                            <div class="mdc-text-field  mdc-text-field--with-trailing-icon d-flex caps-check">
+                                <input class="mdc-text-field__input pwd" type="password" id="password" size="25"
+                                    accesskey="p" autocomplete="off" name="password" value="" /><label for="username" class="mdc-floating-label"><span class="accesskey">P</span>assword:</label>
+                            </div>
+                            <div class="mdc-text-field-helper-line caps-warn">
+                                <p
+                                    class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent mdc-text-field-helper-text--validation-msg text-danger">
+                                    <span >CAPSLOCK key is turned on!</span>
+                                </p>
+                            </div>
+                        </div>
+                        <button class="reveal-password mdc-button mdc-button--raised mdc-input-group-append mdc-icon-button" type="button">
+                            <i class="mdi mdi-eye reveal-password-icon"></i>
+                            <span class="sr-only">Toggle Password</span>
+                        </button>
+                    </section>
+
+                    <section class="cas-field my-3">
+                        </section>
+
+                    <section class="cas-field">
+
+                        <div>
+<!--        <span th:if="${recaptchaVersion=='v2'}" th:remove="tag">--><!--        </span>--></div>
+
+                        <input type="hidden" name="execution" value="bbe7a100-977f-488e-b2b5-52589e07886d_ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmM4VHNmUldhNGc0UWRta3RJU2kxQlNkNTFCWmdFWXBQNFRwU1EtcFZEOC1WMFFCM3E3NEs0bWFKemtZdlI2cVFiakVxNTNQTHNoSjVmalBveXpMSlNkTkx0aHlmODM3T3NZejVfTWY2VFVCSlp1TmZiNER0Y2FQUWhNYnZUV0hpWko0XzJmQUJuekRjekV1U1BaT0tEaVJZTnFMUUJ1aGhZaUdaaTZxZEtPd3pERTdOQ3pFZkFJSFlCSWJ4OURkek1QQnd3aWJSNUg3andsT1VVeVNYd2FWaThvSC1LQ2IxSDVYcFVFamNUWmtlbkZRdU9QcHNWWjAxSmFNc0NGeE93U2lOcERlbEFvNDVSdkNyb1ZBdGhDN251SjlMUFJidjIzTEtMb19lT0V0c01ZZG4tMElaQUNsd0JYaDQ3M0k3NjRzWUllLVhndG52aHRIWHhCWmxjbjM0dVRfQnBjb2NJeE1yeXVhRXhTZEZ2alNOVlRRRHkycE9FTDAzd0pXTE1hdDNkS3dRY1ZGcHdSSVd5bDlOZll5Rk1BY1dfU3lFT0RMbDE1LXVTTGNVd212RGdjbV9GcUtfTlNFaUxuSFhtcVp1dnZ5dnZWWE1uRVhfTWtEWGZEOXF5MkpzQUdTWW05ZXl4cUtPd3JGRlFqNUxEcUFfdFI5UmRUZ1dOS3lrQVo3UDJMajRjYjZlMFdkR0FKbm1JbzBMNm9LNGJLOFd0RHJUak9QZVBLLXNCYzhHTk5jRHRTQllkSnZTRlpLM21ERzFrVFNiaW16cVQzTjlVR1FZZjRtWjZhS3FqbDhrVHVyWWl3RE1Nd3JOczVkNEhod3dFVEFlSHRLRTh0c0hqRjl2clhnS2pwUm9TMDZVbFVxb0Nxd0U4NXF5ZDFXUkFBM25RNHlzMEtydEJKcWVvTmhrbEFGWDJEdzI2WHZSaVRSdEl3Skg0YXdFQkFYUnBIdHJ3NkZNTDNSaTl2M2V6V2s2MmYyZnhnMVdOZWFEckN5a2RGeDRBQWtXNXZiSlhNMzBGdmlWVlBzT3dZLUlWd1hlRF9pQmVRdlFZSG1qTnhpU2F6Nnd6cktiNVFEV2hWVGJ6SlRETk9oeTlXdjhoanVub3U3aHVJeHJZM1E4T2dfdHVHb0JIeXJWdGFNX0xIblFIVGJEVUtiRHBLUHJfRHByTkZ0dVNvcURBT213SzNkX2piSkJ2cFdPcjV1dGNKTUZZa1pNeV9fd0NTMUNuMzhQSGM1Nk9NZ3BnWHN0bU1Fak50OUtvR1V1MVdsQ1Y1S00zMUFUQ1E0aVE1SVI1dG0xaHdOcEFKZUpVa2FrOFpfVE5WcTczWlM5aGtYY1R5djlVTWR1eG9kQVdlLWFOVVg3VmtIMHpnSFB0d0F0MkxkTTAteUxCT3hMZ3JEd3NjcWlWeG9XNGdnUlpXQ3owdXM4SWFWTHhWRWQxT0MtSDV0SFg2cFBFZ3M2S2EzTDVEWUJGUzd3Q0YyVmxqVGozMXh0ZURQblpqQ3BIVXhERG1SWWs0RHZad0pyY3JUMElYTXRWTHczSmJXbWROS05IWjVqU09nb2RMdmRUMUJYRm1DaGJpa200YXNnYW1WYUZDQmVJMG5aQ2ZqS1Nfd0ZqeHpYdkI3d1JPUTlPUnFQN2ZjeEhUREVEZmxQaC1DV3dIREpucXhKalF1UnBBUkxfb0daV1RtVjZNRUNYRU1tRUJsb0pOMUVtMUJab1lLUWk3eG9waEJQMTB4WURhNWJBTF81OVpjbWVtb2pheDB2dmNZZ29ibzhMMEt1cWdWNUhqeWxPQ1BydnZGNS1XVjk3ZVV6LU1JR3k0ZGQ2SjhOeHZkcnVhVkFRaW1vZkFsS09zYzQ4Vi1zZGpzamFncmNFR0RXWGxkd3ZURnVpOFEtM3JkVVB4dUxYcmFpcWF1WGVwOHhPcklJcTQ5ODJHSkQ0dkRLZU9vQTJPeUlJbGRmOEQ3ZUxWVUR3V0dsRW5ITVYyOFUzTi1mVjJic3lXdGJzaXMxYWpicEtoVkFTWkdMdC1pR2lfdmFJa0ZMMXMtN2ZrTHpjaUVNVk12RzVvV1ljWHU4b2xqd1Y5OUUtbW91aDdUTWZNcTA1S2hYaXBUUF9iZVpPc0szZm1nVkFaVEJDR19PSEc3MzZxb3RoM2hPNXV3UzVOYmhXdmxaVEdfRTdHcGJvWE5oeGhXamRoZV9lWEJrWXJmdERDeXl3X0F2OGxiRGNWRVk4MmdYNW5fTWM4N1hLSWhfSFFYVTJvMXp3NDhGem1kOC1LRUtkM09jYnk4dmVuQ3pFaWJkT29EWHdSemEtYnY1Slp1VGFLOFFlUHZZUFMtWUlqUHN3Zlk2Z28tZFNHTDdhekNZRnBCTGRoSUtVZlZpTFpEb0xkNF9RUlhvMWFCRGh5N0VVSGlFX04wNWNSQUlkbTIxd2VETUtKUW14Q1dJRUtidEJCSHFYUjQteExUSDU2ejJHTGQ3ZHN0blZqODRjNVdUUkFWcW11UVFMM3hsWW1udU5ELUlSMjg2cktmQkotZWVwQVdMalYtc0ZVa1Rsd0w3Q3lERllGSHVQc0RPMGMzREp5aGJ0WlllRk5aQVFZTW14UVBHSWJpcHZvSDhvZmZLYkhqUUlsbFFCa25ob3NrUUJhVWtyd2ozV214WjduRGFxSkFZQklyRFFhelNhMVItVEdxdldsV1h3anZXU1hqYXlBcWpVbDIxVXl4WFdlbmtCRjhERGN4aHA2dV9JVkxYU1pyMmQwRGNwQm8tQ283ZmZSUzhrY3NNVi0yZmpiMndvb290MHJTTE5xY2R4SzE4Smh6RHVZYTFxOVNTcjVHTmg1bDVQSE9CYm96R2s4LWMya2FISEZmUmxlbGNuT3JhYW9YR29QQlM3eUFMOVNpQlZ3N3JEeUVuelQ5VHVydE00aDdGelI1NzVua1V4Q21VSGgxbFlFTndNcWN4OW1ZQmhLVEFwUER1Z0paM1lsMy02UHlDZi1hZWFvcm9VanVWaUVCSVU5UmdkbDhBWTI2NDZwRFlwbHdTdnZPeXBER08wUjRxMzhkN3ZoOWt6RmNjWi1PN3VrcnFWX3JzX0NLOHNQZ1phNlh4QXZkMnIyRXZzaC1iQU95X1g0UElwUmlaSTFCVkp4YmJkTUlCQUR3c3RONDB0S1hBTFNLNFlXWW9NcjJacF84X2VyZmxZMzFHYTRZcWpxZzVHbWk3SUF0MDBGT0htWnlhd0owclVBczZUREM5dFhWb3ZTQVVZMjg0TDN3NmtKX2pBMERycnBoMjl1aHBkeWZkVmpla2hrdktGLUd1akJ1R3RnU3lCMnZvZEdGSnhKemZ3OGxfX3hUUG9XaTAyeWt6UkR3bXJndTU1U1ZxLUNDeFNKc2RKNXZkbWx2R2xuMU12YnhYRWhDLWdJbUdpbnRCRGJLMEJ6WFRwLVBQa3YzaGhOZTFyWDByWXo3SEtuOGpVM2ZhSmNUWXRuVjJKaVZScHRKRW5iQ0drdWdzRDRSSHl0LXhvOHVRT1doZjk1eC04SkJ2LUpVSHZtMGV6Y3JUYnVwT0laT05RajBaeXdGeXZHdjR6cjJoUGYtX0dPdnZtekRsSnI5OXBUb1JPMjFnMTNiaXNJbVhNc1FIR3dFNWw0bHpycl9FQmlTaEJSY0g4cUltZWdqSUFQbUV0OFAxX0QwOG5waXhzT2dYZXNtWVRyWUlHbkpNOFVWTFB1NXJFQ0VMNjNWaFZIZWwyYjJPOWl4NkNXVmtXZkIzVkFLYjl2dTBjRmNpMEx2a0FzeGtqWm5fWlYweFJvdW5HVTNQeGxSMUhFLWVFanVLLTdPNklSU1M4djR2UTdKZklNS0s3TUpkeDQ4dDlvbnBDdnFSR1ZyaUIyRkptY0tya0VCcDFtMmNLTVFTNXViY2hOeXVxQjJnM0hiR0NDVXNjLUxyakc2ODNfNUhTUm56MzFxdGdPR2tKSnZKd3B4cE9DWE1ualhJMFNEaUVfb3VGV09xVUt6M3owNW1nXzlxeldrc09SMEtwRnViYUlBTkRNYVdFLUxaQXpYNnZPT2c1WTQ0M18wY2JhZU5fZlpCYkFJdDg4eTBMOWhjd1pHLTlZRHQ2ZnVSVGNtT2lSemRxSFdfZjFQaDdrSnc2Q293VERuNkFreUhOUGFQUHRlVnJYRkJHVkxnUVZIMlJGQnZBcC01bGJ5azRHTkprWW1VRThRX0hTWllCM1dTZU5sT25GbEx4dEhWdGtqSVFFOFFvWkVmZlB5MHlCNVEzRy1IU1V2TXBYT090eThoZlNsUXhYN2lKaTVIeGhhdXIyR2pDeUpJSXJDcENTWHpUaGZjOHFvakREaWdnaFBLUnc1aEFiSjRkZVlIbnMxLVFULWMxMWpzc0lFM0NiTkpJM0RXNW82TUNmMGVXYXZkcFlld2d6Y1ZsSjF5ZE5HcnpvSmljVjFDck5yY2RWeVAzTHJtVWFXU0M2Tk1JUlhBOG5VNUZ1bXpRWkp0ZGhKTEk3UHNGX2hhQUIyR1JKdTdzTURpSktQcTR4Q2NfUWpwQzJiYy1zdzByd2hGazl0bnJTeGRwQ0xhOTlzTlFuWVhhdkxiNkpIUWFPR2thdlpERV9nSG5jVF82UWpHSWlpWnBnSTZnQTQ4dFBjcmFkekRUdDdSemdOVVF4Q2trSHF1VHd3VFRSR1RqZnNRc2ZvTUF5OGFLMmJ5eUh3V1FpdF94MHVBVVIzaF9IaVJDdU05WkVoQktRTGdqdUZXMVVtamtCa2RTeDNzUVNzQi10QlJxTWtVeGNlalZ0QlFkMTRGZVpRYjFGNy1hNWtLRzUwMGZGMVZHaDZhd1lwVThyZGJrWUZLbjRCc2hqcTRsVjlESlB0eGpJSDktWEloSnJrN0pIX2Vuc0Q4aTNhTDJfTndVUS01c0loUlRCMFpHZldQUnc2WXJxYkVNQW1GTzN1QXhiZFdib0djMnVOZFJuR0JqcndEYVBncmNkVjB4ZEUxOUtVTW9SN01LcThPY2t0TlBlYmliQkVoLVVnOExOSVBaUjBsUWdqaWJ6ZlltOE85MnFXQ1NsTGxYNlRsbjY0d3RjVC1QaFd2X3h5Q3A5WXlRMllHemQyd0hLbjZDMHo1alAwUDg4RGJSajN5RDNCMUg5ek8yWWJIUnI0QW9Qa1J3cFV3WTBjY29jZE5fSnJ3MzJsbDVWN1UzVU1KRnNNZWktYkhES0oyWEVPUkRMckdqZkllckdEdFotNUZEc1l5RXM2eUdnTGQ0NWpsNWhyWk9NTnJhejY5dmVFU3IxaFJld1NjUmthY2xvT29oamNXZVJMV1VMaU95YVBMUkhZandsMmdHTEllbkd3VkZrWVhQSmJKNy1RQW9IWnZ3dVdpYTVvUGI5OFd5cl9qaFotQzY2RElXVGp4UFlHamtkY0tfeHpTWjFJSHpROU4xQnpQNHNnVHNPQkVob1BaVFhndDU0S1hBSWhMeV9PeUx1a1BMcnk0d3BFdm9LMC56dlJOaVprOEhRQldIa3g0VXBTTXVQV1RXRktqajYxMkY3SXBBenQ4cHNvM3dvRHU2c2ROWEFfSmI5T21XTVM4X3J4aUt6Yk5hMWtnZnFreEZGNk9tUQ=="/><input type="hidden" name="_eventId" value="submit"/><input type="hidden" name="geolocation"/></section>
+
+                    <span>
+            <button class="mdc-button mdc-button--raised"
+                        name="submitBtn"
+                        type="submit"
+                        accesskey="l">
+                    <span class="mdc-button__label" >LOGIN</span>
+                </button>
+            </span>
+    </form>
+
+                <hr class="my-4" /><div id="pmlinks" class="my-2">
+    <form class="d-inline-block" method="post" id="passwordManagementForm">
+        <input type="hidden" name="execution" value="bbe7a100-977f-488e-b2b5-52589e07886d_ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmM4VHNmUldhNGc0UWRta3RJU2kxQlNkNTFCWmdFWXBQNFRwU1EtcFZEOC1WMFFCM3E3NEs0bWFKemtZdlI2cVFiakVxNTNQTHNoSjVmalBveXpMSlNkTkx0aHlmODM3T3NZejVfTWY2VFVCSlp1TmZiNER0Y2FQUWhNYnZUV0hpWko0XzJmQUJuekRjekV1U1BaT0tEaVJZTnFMUUJ1aGhZaUdaaTZxZEtPd3pERTdOQ3pFZkFJSFlCSWJ4OURkek1QQnd3aWJSNUg3andsT1VVeVNYd2FWaThvSC1LQ2IxSDVYcFVFamNUWmtlbkZRdU9QcHNWWjAxSmFNc0NGeE93U2lOcERlbEFvNDVSdkNyb1ZBdGhDN251SjlMUFJidjIzTEtMb19lT0V0c01ZZG4tMElaQUNsd0JYaDQ3M0k3NjRzWUllLVhndG52aHRIWHhCWmxjbjM0dVRfQnBjb2NJeE1yeXVhRXhTZEZ2alNOVlRRRHkycE9FTDAzd0pXTE1hdDNkS3dRY1ZGcHdSSVd5bDlOZll5Rk1BY1dfU3lFT0RMbDE1LXVTTGNVd212RGdjbV9GcUtfTlNFaUxuSFhtcVp1dnZ5dnZWWE1uRVhfTWtEWGZEOXF5MkpzQUdTWW05ZXl4cUtPd3JGRlFqNUxEcUFfdFI5UmRUZ1dOS3lrQVo3UDJMajRjYjZlMFdkR0FKbm1JbzBMNm9LNGJLOFd0RHJUak9QZVBLLXNCYzhHTk5jRHRTQllkSnZTRlpLM21ERzFrVFNiaW16cVQzTjlVR1FZZjRtWjZhS3FqbDhrVHVyWWl3RE1Nd3JOczVkNEhod3dFVEFlSHRLRTh0c0hqRjl2clhnS2pwUm9TMDZVbFVxb0Nxd0U4NXF5ZDFXUkFBM25RNHlzMEtydEJKcWVvTmhrbEFGWDJEdzI2WHZSaVRSdEl3Skg0YXdFQkFYUnBIdHJ3NkZNTDNSaTl2M2V6V2s2MmYyZnhnMVdOZWFEckN5a2RGeDRBQWtXNXZiSlhNMzBGdmlWVlBzT3dZLUlWd1hlRF9pQmVRdlFZSG1qTnhpU2F6Nnd6cktiNVFEV2hWVGJ6SlRETk9oeTlXdjhoanVub3U3aHVJeHJZM1E4T2dfdHVHb0JIeXJWdGFNX0xIblFIVGJEVUtiRHBLUHJfRHByTkZ0dVNvcURBT213SzNkX2piSkJ2cFdPcjV1dGNKTUZZa1pNeV9fd0NTMUNuMzhQSGM1Nk9NZ3BnWHN0bU1Fak50OUtvR1V1MVdsQ1Y1S00zMUFUQ1E0aVE1SVI1dG0xaHdOcEFKZUpVa2FrOFpfVE5WcTczWlM5aGtYY1R5djlVTWR1eG9kQVdlLWFOVVg3VmtIMHpnSFB0d0F0MkxkTTAteUxCT3hMZ3JEd3NjcWlWeG9XNGdnUlpXQ3owdXM4SWFWTHhWRWQxT0MtSDV0SFg2cFBFZ3M2S2EzTDVEWUJGUzd3Q0YyVmxqVGozMXh0ZURQblpqQ3BIVXhERG1SWWs0RHZad0pyY3JUMElYTXRWTHczSmJXbWROS05IWjVqU09nb2RMdmRUMUJYRm1DaGJpa200YXNnYW1WYUZDQmVJMG5aQ2ZqS1Nfd0ZqeHpYdkI3d1JPUTlPUnFQN2ZjeEhUREVEZmxQaC1DV3dIREpucXhKalF1UnBBUkxfb0daV1RtVjZNRUNYRU1tRUJsb0pOMUVtMUJab1lLUWk3eG9waEJQMTB4WURhNWJBTF81OVpjbWVtb2pheDB2dmNZZ29ibzhMMEt1cWdWNUhqeWxPQ1BydnZGNS1XVjk3ZVV6LU1JR3k0ZGQ2SjhOeHZkcnVhVkFRaW1vZkFsS09zYzQ4Vi1zZGpzamFncmNFR0RXWGxkd3ZURnVpOFEtM3JkVVB4dUxYcmFpcWF1WGVwOHhPcklJcTQ5ODJHSkQ0dkRLZU9vQTJPeUlJbGRmOEQ3ZUxWVUR3V0dsRW5ITVYyOFUzTi1mVjJic3lXdGJzaXMxYWpicEtoVkFTWkdMdC1pR2lfdmFJa0ZMMXMtN2ZrTHpjaUVNVk12RzVvV1ljWHU4b2xqd1Y5OUUtbW91aDdUTWZNcTA1S2hYaXBUUF9iZVpPc0szZm1nVkFaVEJDR19PSEc3MzZxb3RoM2hPNXV3UzVOYmhXdmxaVEdfRTdHcGJvWE5oeGhXamRoZV9lWEJrWXJmdERDeXl3X0F2OGxiRGNWRVk4MmdYNW5fTWM4N1hLSWhfSFFYVTJvMXp3NDhGem1kOC1LRUtkM09jYnk4dmVuQ3pFaWJkT29EWHdSemEtYnY1Slp1VGFLOFFlUHZZUFMtWUlqUHN3Zlk2Z28tZFNHTDdhekNZRnBCTGRoSUtVZlZpTFpEb0xkNF9RUlhvMWFCRGh5N0VVSGlFX04wNWNSQUlkbTIxd2VETUtKUW14Q1dJRUtidEJCSHFYUjQteExUSDU2ejJHTGQ3ZHN0blZqODRjNVdUUkFWcW11UVFMM3hsWW1udU5ELUlSMjg2cktmQkotZWVwQVdMalYtc0ZVa1Rsd0w3Q3lERllGSHVQc0RPMGMzREp5aGJ0WlllRk5aQVFZTW14UVBHSWJpcHZvSDhvZmZLYkhqUUlsbFFCa25ob3NrUUJhVWtyd2ozV214WjduRGFxSkFZQklyRFFhelNhMVItVEdxdldsV1h3anZXU1hqYXlBcWpVbDIxVXl4WFdlbmtCRjhERGN4aHA2dV9JVkxYU1pyMmQwRGNwQm8tQ283ZmZSUzhrY3NNVi0yZmpiMndvb290MHJTTE5xY2R4SzE4Smh6RHVZYTFxOVNTcjVHTmg1bDVQSE9CYm96R2s4LWMya2FISEZmUmxlbGNuT3JhYW9YR29QQlM3eUFMOVNpQlZ3N3JEeUVuelQ5VHVydE00aDdGelI1NzVua1V4Q21VSGgxbFlFTndNcWN4OW1ZQmhLVEFwUER1Z0paM1lsMy02UHlDZi1hZWFvcm9VanVWaUVCSVU5UmdkbDhBWTI2NDZwRFlwbHdTdnZPeXBER08wUjRxMzhkN3ZoOWt6RmNjWi1PN3VrcnFWX3JzX0NLOHNQZ1phNlh4QXZkMnIyRXZzaC1iQU95X1g0UElwUmlaSTFCVkp4YmJkTUlCQUR3c3RONDB0S1hBTFNLNFlXWW9NcjJacF84X2VyZmxZMzFHYTRZcWpxZzVHbWk3SUF0MDBGT0htWnlhd0owclVBczZUREM5dFhWb3ZTQVVZMjg0TDN3NmtKX2pBMERycnBoMjl1aHBkeWZkVmpla2hrdktGLUd1akJ1R3RnU3lCMnZvZEdGSnhKemZ3OGxfX3hUUG9XaTAyeWt6UkR3bXJndTU1U1ZxLUNDeFNKc2RKNXZkbWx2R2xuMU12YnhYRWhDLWdJbUdpbnRCRGJLMEJ6WFRwLVBQa3YzaGhOZTFyWDByWXo3SEtuOGpVM2ZhSmNUWXRuVjJKaVZScHRKRW5iQ0drdWdzRDRSSHl0LXhvOHVRT1doZjk1eC04SkJ2LUpVSHZtMGV6Y3JUYnVwT0laT05RajBaeXdGeXZHdjR6cjJoUGYtX0dPdnZtekRsSnI5OXBUb1JPMjFnMTNiaXNJbVhNc1FIR3dFNWw0bHpycl9FQmlTaEJSY0g4cUltZWdqSUFQbUV0OFAxX0QwOG5waXhzT2dYZXNtWVRyWUlHbkpNOFVWTFB1NXJFQ0VMNjNWaFZIZWwyYjJPOWl4NkNXVmtXZkIzVkFLYjl2dTBjRmNpMEx2a0FzeGtqWm5fWlYweFJvdW5HVTNQeGxSMUhFLWVFanVLLTdPNklSU1M4djR2UTdKZklNS0s3TUpkeDQ4dDlvbnBDdnFSR1ZyaUIyRkptY0tya0VCcDFtMmNLTVFTNXViY2hOeXVxQjJnM0hiR0NDVXNjLUxyakc2ODNfNUhTUm56MzFxdGdPR2tKSnZKd3B4cE9DWE1ualhJMFNEaUVfb3VGV09xVUt6M3owNW1nXzlxeldrc09SMEtwRnViYUlBTkRNYVdFLUxaQXpYNnZPT2c1WTQ0M18wY2JhZU5fZlpCYkFJdDg4eTBMOWhjd1pHLTlZRHQ2ZnVSVGNtT2lSemRxSFdfZjFQaDdrSnc2Q293VERuNkFreUhOUGFQUHRlVnJYRkJHVkxnUVZIMlJGQnZBcC01bGJ5azRHTkprWW1VRThRX0hTWllCM1dTZU5sT25GbEx4dEhWdGtqSVFFOFFvWkVmZlB5MHlCNVEzRy1IU1V2TXBYT090eThoZlNsUXhYN2lKaTVIeGhhdXIyR2pDeUpJSXJDcENTWHpUaGZjOHFvakREaWdnaFBLUnc1aEFiSjRkZVlIbnMxLVFULWMxMWpzc0lFM0NiTkpJM0RXNW82TUNmMGVXYXZkcFlld2d6Y1ZsSjF5ZE5HcnpvSmljVjFDck5yY2RWeVAzTHJtVWFXU0M2Tk1JUlhBOG5VNUZ1bXpRWkp0ZGhKTEk3UHNGX2hhQUIyR1JKdTdzTURpSktQcTR4Q2NfUWpwQzJiYy1zdzByd2hGazl0bnJTeGRwQ0xhOTlzTlFuWVhhdkxiNkpIUWFPR2thdlpERV9nSG5jVF82UWpHSWlpWnBnSTZnQTQ4dFBjcmFkekRUdDdSemdOVVF4Q2trSHF1VHd3VFRSR1RqZnNRc2ZvTUF5OGFLMmJ5eUh3V1FpdF94MHVBVVIzaF9IaVJDdU05WkVoQktRTGdqdUZXMVVtamtCa2RTeDNzUVNzQi10QlJxTWtVeGNlalZ0QlFkMTRGZVpRYjFGNy1hNWtLRzUwMGZGMVZHaDZhd1lwVThyZGJrWUZLbjRCc2hqcTRsVjlESlB0eGpJSDktWEloSnJrN0pIX2Vuc0Q4aTNhTDJfTndVUS01c0loUlRCMFpHZldQUnc2WXJxYkVNQW1GTzN1QXhiZFdib0djMnVOZFJuR0JqcndEYVBncmNkVjB4ZEUxOUtVTW9SN01LcThPY2t0TlBlYmliQkVoLVVnOExOSVBaUjBsUWdqaWJ6ZlltOE85MnFXQ1NsTGxYNlRsbjY0d3RjVC1QaFd2X3h5Q3A5WXlRMllHemQyd0hLbjZDMHo1alAwUDg4RGJSajN5RDNCMUg5ek8yWWJIUnI0QW9Qa1J3cFV3WTBjY29jZE5fSnJ3MzJsbDVWN1UzVU1KRnNNZWktYkhES0oyWEVPUkRMckdqZkllckdEdFotNUZEc1l5RXM2eUdnTGQ0NWpsNWhyWk9NTnJhejY5dmVFU3IxaFJld1NjUmthY2xvT29oamNXZVJMV1VMaU95YVBMUkhZandsMmdHTEllbkd3VkZrWVhQSmJKNy1RQW9IWnZ3dVdpYTVvUGI5OFd5cl9qaFotQzY2RElXVGp4UFlHamtkY0tfeHpTWjFJSHpROU4xQnpQNHNnVHNPQkVob1BaVFhndDU0S1hBSWhMeV9PeUx1a1BMcnk0d3BFdm9LMC56dlJOaVprOEhRQldIa3g0VXBTTXVQV1RXRktqajYxMkY3SXBBenQ4cHNvM3dvRHU2c2ROWEFfSmI5T21XTVM4X3J4aUt6Yk5hMWtnZnFreEZGNk9tUQ==" /><input type="hidden" name="_eventId" value="resetPassword" /><span class="fa fa-unlock"></span>
+        <a href="javascript:void(0)"
+           onclick="document.getElementById('passwordManagementForm').submit();" >Forget Password?</a>
+    </form>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    
+
+    </div>
+
+                <script type="text/javascript">
+                    /*<![CDATA[*/
+                    var i = "One moment please..."
+                    var j = "LOGIN"
+                        /*]]>*/
+                        $(window).on('pageshow', function () {
+                            $(':submit').prop('disabled', false);
+                            $(':submit').attr('value', j);
+                        });
+                    $(document).ready(function () {
+                        $("#fm1").submit(function () {
+                            $(":submit").attr("disabled", true);
+                            $(":submit").attr("value", i);
+                            return true;
+                        });
+                    });
+                </script>
+
+
+            </div>
+            <div id="sidebar">
+            <div class="sidebar-content">
+                <p>For security reasons, please <a href="logout">log out</a> and exit your web browser when you are done accessing services that require authentication!</p>
+            </div>
+        </div>
+        </div>
+            </section>
+            <section id="providers" class="login-section login-providers">
+                <div>
+            <!--                <h3 class="text-center mt-md-0 mt-4">--><!--                    <i class="fas fa-user-shield"></i>--><!--                    <span th:utext="#{screen.welcome.label.loginwith}">External Identity Providers</span>--><!--                </h3>--><div class="d-flex justify-content-center" style="display:block">
+                <ul class="list-unstyled d-flex flex-column m-0 flex-fill">
+                    <li class="p-1 login-provider-item">
+                        <div id="myTabContent" class="tab-content">
+                            <div id="weixin" style="height:405px;">
+                                <div align="center">
+                                    <h3 class="text-center">
+                                        &nbsp;
+                                        <!--<span th:utext="#{screen.wechat.login}">Wechat Login</span>-->
+                                    </h3>
+                                    <div class="impowerBox" style="width:280px;height:370px;display:block;">
+                                        <div id="qrcode" style="background-color:white;width:280px;height:280px;">
+                                            <div id="wx_after_warning" class="wrp_code_rl_mask" style="width:290px;height:290px;display:none">
+                                                <i class="status_icon icon38_msg error" style="margin-left:10px;margin-top:50px;"></i>
+                                                <h3>QR-Code Expired</h3>
+                                                <p>You can refresh page and scan again</p>
+                                                <button style="cursor: pointer;border-radius: 2px;border: 1px solid #AAA;min-width: 24px;height: 24px;padding: 0 12px;background: #F5F5F5;" onclick="window.location.reload()" ><span>Refresh</span></button>
+                                            </div>
+                                            <div id="wx_after_cancel" class="wrp_code_rl_mask" style="width:290px;height:290px;display:none">
+                                                <i class="status_icon icon38_msg warn" style="margin-left:10px;margin-top:50px;"></i>
+                                                <h3>Cancel Login</h3>
+                                                <p>You can refresh page and scan again</p>
+                                                <button style="cursor: pointer;border-radius: 2px;border: 1px solid #AAA;min-width: 24px;height: 24px;padding: 0 12px;background: #F5F5F5;" onclick="window.location.reload()" ><span>Refresh</span></button>
+                                            </div>
+                                        </div>
+                                        <div class="info">
+                                            <div class="status status_browser js_status" id="wx_default_tip"><p>Scan QR-Code using WeChat</p></div>
+                                            <div class="status status_succ js_status" style="display:none" id="wx_after_scan"><i class="status_icon icon38_msg succ"></i><div class="status_txt"><h4>Scan successfully</h4><p>Please confirm login in WeChat</p></div></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <script src="/cas/js/easy.qrcode.js"></script>
+                            <script>
+                                var uu = "clientredirect?client_name=Wework\u0026service=https%3A%2F%2Fsakai.sustech.edu.cn%2Fsakai-login-tool%2Fcontainer";
+                                $.get(uu, {
+                                }, function(data) {
+                                    var temp = eval(data);
+                                    var timer = null;
+                                    var options = {
+                                        text: temp.url,
+                                        width: 280,
+                                        height: 280,
+                                        colorDark : "#000000",
+                                        colorLight : "#ffffff",
+                                        correctLevel : QRCode.CorrectLevel.L, // L, M, Q, H
+                                        dotScale: 0.7,
+                                        timing: '#000000',
+                                        logo:"/cas/images/wecom.png",
+                                        logoWidth:50,
+                                        logoHeight:50
+                                    }
+                                    new QRCode(document.getElementById("qrcode"), options);
+                                });
+                                // function showWechatQR(){
+                                timer = window.setInterval(showalert, 5000);
+                                changeStatus("default");
+                                // }
+                                function showalert() {
+                                    $.get("?client_name=Wework&wechat=check", {
+                                    }, function(data) {
+                                        var temp = JSON.parse(data);
+                                        if(temp.status == "confirm"){
+                                            clearInterval(timer);
+                                            var form = $('<form id="pac4jLogin" action="" method="post">'+
+                                                '<input name="client_name" value="'+temp.client_name+'">'+
+                                                '<input name="state" value="'+temp.state+'">'+
+                                                '<input name="code" value="'+temp.code+'">'+
+                                                '</form>');
+                                            $('body').append(form);
+                                            form.submit();
+                                            //window.location.replace(temp.redirect);
+                                        }else if(temp.status == 'cancel'){
+                                            clearInterval(timer);
+                                            changeStatus(temp.status);
+                                            window.event.returnValue = false;
+                                        }else if(temp.status == 'scan'){
+                                            changeStatus(temp.status)
+                                        }else if(temp.status =='warning'){
+                                            clearInterval(timer);
+                                            changeStatus(temp.status)
+                                        }
+                                    });
+                                }
+                                function changeStatus(status){
+                                    if(status === 'cancel'){
+                                        $("#wx_default_tip").hide();
+                                        $("#wx_after_scan").hide();
+                                        $("#wx_after_cancel").show();
+                                        $("#wx_after_warning").hide();
+                                    }else if(status === 'scan'){
+                                        $("#wx_default_tip").hide();
+                                        $("#wx_after_scan").show();
+                                        $("#wx_after_cancel").hide();
+                                        $("#wx_after_warning").hide();
+                                    }else if(status === 'default'){
+                                        $("#wx_default_tip").show();
+                                        $("#wx_after_scan").hide();
+                                        $("#wx_after_cancel").hide();
+                                        $("#wx_after_warning").hide();
+                                    }else{
+                                        $("#wx_default_tip").show();
+                                        $("#wx_after_scan").hide();
+                                        $("#wx_after_cancel").hide();
+                                        $("#wx_after_warning").show();
+                                    }
+                                }
+                            </script>
+                        </div>
+                        <!--<iframe th:if="${entry.name == 'Wecom'}" th:src="@{${entry.redirectUrl}}" width="100%" height="400px" frameborder="0"></iframe>--></li>
+                    </ul>
+            </div>
+        </div>
+        <script>
+            var redirectTo = $("a[autoRedirect=true]").attr("href");
+            if (redirectTo != null && redirectTo != undefined) {
+                window.location.href = redirectTo;
+            }
+        </script>
+    </section>
+<!--            <section id="acceptto" class="login-section login-qr d-xs-none d-md-block" th:if="${accepttoApplicationId}">--><!--                <div th:replace="fragments/accepttoQRCode :: accepttoQRCode">--><!--                    <a href="fragments/accepttoQRCode.html">accepttoQRCode</a>--><!--                </div>--><!--            </section>--></div>
+    </div>
+    </main>
+</div>
+
+<footer class="py-4 d-flex justify-content-center cas-footer">
+    <div id="copyright" class="mr-2 d-inline-block">Copyright &copy; 2020 SUSTech. Powered by ITS(TEL:88010777)</div>
+</footer>
+
+</body>
+</html>
